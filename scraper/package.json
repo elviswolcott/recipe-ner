@@ -1,0 +1,19 @@
+{
+  "name": "recipe-scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Elvis Wolcott, Melissa Kazazic",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.10",
+    "node-fetch": "^3.1.0",
+    "sitemapper": "^3.2.0",
+    "yargs": "^17.3.0"
+  }
+}
