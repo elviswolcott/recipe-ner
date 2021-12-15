@@ -1,2 +1,7 @@
 Lib
 node_modules
+demo.txt
+demo.clean.json
+demo.json
+# wip GUI labeling tool
+highlighter
