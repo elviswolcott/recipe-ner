@@ -11,6 +11,7 @@ import get from './get.js'
 import batch from './batch.js'
 import clean from './clean.js'
 import transcribe from './transcribe.js'
+import extract from './extract.js'
 
 // parse command line parameters and call sub modules
 // parameters are reused for all commands
@@ -107,6 +108,29 @@ yargs(hideBin(process.argv))
       })
     } else {
       transcribe(file, options);
+    }
+  })
+  .command('extract <file>', 'take json and produce only the ingredients and quantities. '
+  + 'Alternatively, if file is .txt file listing json files, extract from each individual file', () => {}, (argv) => {
+    const { file, ...options } = argv;
+    if (file.endsWith('.txt')) {
+      readFile(file, 'utf-8').then(text => {
+        const files = text.trim().split('\n');
+        // run against every file
+        const promises = Promise.all(files.map(file => extract(file.replace('jsonld', 'json'))));
+        promises.then(results => {
+          // flatten data
+          const ingredients = results.map(r => r.ingredients).flat();
+          const quantities = results.map(r => r.quantities).flat();
+          // remove duplicates
+          const uniqueIngredients = [...new Set(ingredients)];
+          const uniqueQuantities = [...new Set(quantities)];
+          writeFile(`${options.dir}/ingredients.txt`, uniqueIngredients.join('\n'));
+          writeFile(`${options.dir}/quantities.txt`, uniqueQuantities.join('\n'));
+        })
+      })
+    } else {
+      extract(file).then(console.log)
     }
   })
   .demandCommand(1)
