@@ -10,7 +10,9 @@ const transcribe = async (file, options) => {
     const steps = json.recipeInstructions;
     const recipe = `Ingredients:\n${ingredients.join('\n')}\n\nInstructions:\n${steps.filter(step => step["@type"] === "HowToStep").map(step => step.text).join('\n')}`
     if (options.out) {
-      await writeFile(options.out, recipe, 'utf-8');
+      // TODO: replace some of the weird characters with standard equivalents/best match
+      // TODO: expand unicode fractions
+      await writeFile(options.out, recipe.replace(/[^ -~\n —–éñ’]+/g, ""), 'utf-8');
       return recipe;
     } else if (!options.quiet) {
       console.log(recipe);
