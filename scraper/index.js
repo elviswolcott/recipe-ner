@@ -52,6 +52,13 @@ yargs(hideBin(process.argv))
     demandOption: false,
     describe: 'Directory for dataset',
   })
+  .option('f', {
+    alias: 'format',
+    type: 'string',
+    default: 'text',
+    demandOption: false,
+    describe: 'Format: text or json',
+  })
   .command('list <url>', 'generate a list of pages from the sitemap URL', () => {}, (argv) => {
     const { url, ...options } = argv;
     list(url, options);
@@ -113,6 +120,9 @@ yargs(hideBin(process.argv))
   .command('extract <file>', 'take json and produce only the ingredients and quantities. '
   + 'Alternatively, if file is .txt file listing json files, extract from each individual file', () => {}, (argv) => {
     const { file, ...options } = argv;
+    if (options.format !== 'text' && options.format !== 'json') {
+      console.error("format must be either 'text' or 'json'");
+    }
     if (file.endsWith('.txt')) {
       readFile(file, 'utf-8').then(text => {
         const files = text.trim().split('\n');
@@ -125,8 +135,13 @@ yargs(hideBin(process.argv))
           // remove duplicates
           const uniqueIngredients = [...new Set(ingredients)];
           const uniqueQuantities = [...new Set(quantities)];
-          writeFile(`${options.dir}/ingredients.txt`, uniqueIngredients.join('\n'));
-          writeFile(`${options.dir}/quantities.txt`, uniqueQuantities.join('\n'));
+          if (options.format == 'json') {
+            writeFile(`${options.dir}/ingredients.json`, JSON.stringify(uniqueIngredients));
+            writeFile(`${options.dir}/quantities.json`, JSON.stringify(uniqueQuantities));
+          } else {
+            writeFile(`${options.dir}/ingredients.txt`, uniqueIngredients.join('\n'));
+            writeFile(`${options.dir}/quantities.txt`, uniqueQuantities.join('\n'));
+          }
         })
       })
     } else {
